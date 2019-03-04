@@ -76,7 +76,7 @@
     position: absolute;
     float: right;
     right: 25px;
-    top: 25px;
+    top: 100px;
 }
 
 .score {
@@ -84,7 +84,7 @@
     position: absolute;
     float: left;
     left: 25px;
-    top: 25px;
+    top: 100px;
     font-size: 40px;
     font-weight: bold;
     color: #208600;
