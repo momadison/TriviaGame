@@ -9,6 +9,16 @@ var codingQuestions = [];  //array for coding question objects
 //JQuery Variables
 var headlines = $(".display-4");
 
+//Score Variables
+var score = 0;
+var lives = 3;
+
+//sound variables
+var clapAudio = new Audio('assets/audio/clap.wav');
+var clickAudio = new Audio('assets/audio/click.wav');
+var wrongAudio = new Audio('assets/audio/wrong.wav');
+var gameOverAudio = new Audio('assets/audio/gameOver.wav');
+
 //function to create new object
 function newQuestion(array, question, cA, wA1, wA2, wA3) {
     var obj = {};
@@ -87,9 +97,16 @@ newQuestion(codingQuestions, "How do you add a new paragraph in HTML", "<p>", "<
 
 //========================SETUP GAMEBOARD========================================
 var category = ["Mathematics", "Science", "Physics", "Coding", "Family"];
-var points = 600;
+var grid = [];
+    for (var h = 0; h < 25; h++) {
+        grid.push(false);
+    }
 
 function gridBoard(appendReference, column, row) {
+if ((lives >= 0) && (grid.indexOf(false) !== -1)) {
+    var points = 600;
+    $(".badge-light").text(lives);
+    var dataBox = 0;
 //Add Div for Row
     for (var i = 0; i < row; i++)
     {
@@ -105,10 +122,25 @@ function gridBoard(appendReference, column, row) {
             //Classify as column and add or subtract any padding
             colDiv.addClass("col-"+colSize+" box pr-3");
             //Place in column content
-            colDiv.html("<div class='buttonChoice' data-category='"+category[j]+"' data-points='"+points+"'>"+category[j]+"<br><h1>$"+points+"</h1></div>");
+            if (grid[dataBox] === false) {
+                colDiv.html("<div class='buttonChoice' data-box='"+dataBox+"' data-category='"+category[j]+"' data-points='"+points+"'>"+category[j]+"<br><h1>$"+points+"</h1></div>");
+            }
+            else if (grid[dataBox] === true) {
+                var buttonChosen = $("<div>");
+                buttonChosen.addClass("buttonChosen");
+                colDiv.append(buttonChosen);
+            }
+            dataBox++;
             rowDiv.append(colDiv); 
         }
     }
+}
+else {
+    gameOverAudio.play();
+    $("#stage").remove();
+    headlines.text("Game Over");
+    addRowCol(12,"finalScore", $('.wrapper'), "$"+score);
+}
 }
 
 gridBoard("#stage",5,5);
@@ -141,26 +173,20 @@ function riddleMe(points, category) {
     $(".wrapper").append(stageDiv);
 
     //pick a random question object based on the category the user picked
-    console.log(category);
     if (category === "Family") {
         questObject = familyQuestions[Math.floor(Math.random() * familyQuestions.length)];
-        console.log(questObject.question);
     }
     else if (category === "Mathematics") {
         questObject = mathQuestions[Math.floor(Math.random() * mathQuestions.length)];
-        console.log(questObject.question);
     } 
     else if (category === "Science") {
         questObject = scienceQuestions[Math.floor(Math.random() * scienceQuestions.length)];
-        console.log(questObject.question);
     } 
     else if (category === "Physics") {
         questObject = physicQuestions[Math.floor(Math.random() * physicQuestions.length)];
-        console.log(questObject.question);
     } 
     else if (category === "Coding") {
         questObject = codingQuestions[Math.floor(Math.random() * codingQuestions.length)];
-        console.log(questObject.question);
     }     
 
     //add in first row and column with the question
@@ -198,11 +224,44 @@ function riddleMe(points, category) {
 
     //on click function for the answer clicked and check if its right or wrong
     $(".answer").click(function () {
+        clickAudio.play();
         var correctCheck = $(this).data("answer");
         if (correctCheck === correctAnswer) {
-            userAnswer = true;
+            //======CORRECT GUESS================
+            score += points;
+            headlines.text("Correct");
+            $(".score").text("$"+score);
+            $("#stage").remove();
+            clapAudio.play();
+
+            var delayReset = setTimeout(function() {
+                //add back the stage 
+                var stageDiv = $("<div>");
+                stageDiv.addClass("container");
+                stageDiv.attr("id", "stage");
+                $(".wrapper").append(stageDiv);
+                
+                //change headlines and add grid board back
+                headlines.text("Choose Your Category");
+                gridBoard("#stage",5,5);
+
+                //on click Grid board
+                $(".buttonChoice").click(function () {
+                clickAudio.play();
+                var points = $(this).data('points');
+                var category = $(this).data('category');
+                var box = $(this).data('box');
+                grid[box] = true;
+                riddleMe(points, category);
+                }) 
+
+            }, 1000)
+
         }
         else {
+            //=======WRONG GUESS============
+            wrongAudio.play();
+            lives -= 1;
             var answerWrapper = $(".answerWrapper");
             headlines.text("Wrong");
             answerWrapper.remove();
@@ -211,14 +270,35 @@ function riddleMe(points, category) {
             stageDiv.append(answerWrapper);
             addRowCol(12,"correctTitle", answerWrapper, "The correct answer is:");
             addRowCol(12,"finalAnswer", answerWrapper, correctAnswer);
+            var delayReset = setTimeout(function() {
+                $("#stage").remove();
+                //add back the stage 
+                var stageDiv = $("<div>");
+                stageDiv.addClass("container");
+                stageDiv.attr("id", "stage");
+                $(".wrapper").append(stageDiv);
+                headlines.text("Choose Your Category");
+                gridBoard("#stage",5,5);
+                $(".buttonChoice").click(function () {
+                    clickAudio.play();
+                    var points = $(this).data('points');
+                    var category = $(this).data('category');
+                    var box = $(this).data('box');
+                    grid[box] = true;
+                    riddleMe(points, category);
+                }) 
+            }, 3000)
         }
     })
     
 }
 
 $(".buttonChoice").click(function () {
+    clickAudio.play()
     var points = $(this).data('points');
     var category = $(this).data('category');
+    var box = $(this).data('box');
+    grid[box] = true;
     riddleMe(points, category);
 })
 

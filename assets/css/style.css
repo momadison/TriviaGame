@@ -17,7 +17,13 @@
     margin-right: 0px;
     margin-left: 0px;
   }
-
+  .buttonChosen {
+    line-height: 75px;
+    width: 150px;
+    height: 150px;
+    background-color:#575757;
+    border: 5px solid #979797;
+}
   .buttonChoice {
       line-height: 75px;
       width: 150px;
@@ -64,6 +70,33 @@
     font-size: 24px;
     font-weight: bold;
     color: red;
+}
+
+.lives {
+    position: absolute;
+    float: right;
+    right: 25px;
+    top: 25px;
+}
+
+.score {
+    font-family: 'ZCOOL QingKe HuangYou', cursive;
+    position: absolute;
+    float: left;
+    left: 25px;
+    top: 25px;
+    font-size: 40px;
+    font-weight: bold;
+    color: #208600;
+}
+
+.finalScore {
+    font-family: 'ZCOOL QingKe HuangYou', cursive;
+    padding-top: 50px;
+    font-size: 80px;
+    font-weight: bold;
+    color: #208600;
+    text-align: center;
 }
 
 
