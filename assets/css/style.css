@@ -75,8 +75,8 @@
 .lives {
     position: absolute;
     float: right;
-    right: 25px;
-    top: 100px;
+    right: 15px;
+    top: 110px;
 }
 
 .score {
