@@ -159,7 +159,7 @@ function addRowCol(size, classy, append, coltext) {
 
 //function to setup new board and execute whether the correct choice is picked
 function riddleMe(points, category) {
-    //===================FUNCTION FOR WRONG GUESS===================
+    //===================FUNCTIONS FOR FUNCTION===================
 function wrongGuess() {
     //=======WRONG GUESS============
     clearInterval(intervalID);
@@ -174,6 +174,12 @@ function wrongGuess() {
     stageDiv.append(answerWrapper);
     addRowCol(12,"correctTitle", answerWrapper, "The correct answer is:");
     addRowCol(12,"finalAnswer", answerWrapper, correctAnswer);
+    var newGif = $("<img>");
+    newGif.addClass("giffy");
+    answerWrapper.append(newGif);
+    var gifClass = $(".giffy");
+    getURL("loser", gifClass);
+    
     var delayReset = setTimeout(function() {
         $("#stage").remove();
         //add back the stage 
@@ -191,8 +197,25 @@ function wrongGuess() {
             grid[box] = true;
             riddleMe(points, category);
         }) 
-    }, 3000)
+    }, 5000)
 }
+
+//function to return giffy url on search request
+    function getURL(search, imgClass) {
+
+    var search = search;
+    var queryURL = "https://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&q="+search;
+
+    $.ajax({
+      url: queryURL,
+      method: "GET"
+    }).then(function(response) {
+        var i = Math.floor(Math.random() * 25 + 1);
+        var dataResponse = response.data[i].images.original.url;
+        imgClass.attr("src", dataResponse);
+    });
+
+    }
 
     var questObject = {};
     //remove stage
@@ -203,7 +226,7 @@ function wrongGuess() {
     
     
     //start the clock
-    var countClock = 10;
+    var countClock = 20;
     var newTimerDiv = $("<div>");
     newTimerDiv.text("You have " + countClock + " seconds");
     newTimerDiv.addClass("timer");
@@ -293,8 +316,14 @@ function wrongGuess() {
             $(".score").text("$"+score);
             $("#stage").remove();
             clapAudio.play();
+            var newGif = $("<img>");
+            newGif.addClass("giffy");
+            $(".wrapper").append(newGif);
+            var gifClass = $(".giffy");
+            getURL("winner", gifClass);
 
             var delayReset = setTimeout(function() {
+                $(".giffy").remove();
                 //add back the stage 
                 var stageDiv = $("<div>");
                 stageDiv.addClass("container");
@@ -315,7 +344,7 @@ function wrongGuess() {
                 riddleMe(points, category);
                 }) 
 
-            }, 1000)
+            }, 5000)
 
         }
         else {

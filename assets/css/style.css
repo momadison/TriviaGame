@@ -79,6 +79,7 @@
     float:right;
     vertical-align:middle;
     left: 425px;
+    margin-left: auto;
 }
 
 @media (max-width: 1050px) {
@@ -127,4 +128,8 @@
     font-weight: bold;
 }
 
+.giffy {
+    bottom: 50px;
+    padding-top: 50px;
+}
 
