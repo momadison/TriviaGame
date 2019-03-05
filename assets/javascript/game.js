@@ -159,12 +159,70 @@ function addRowCol(size, classy, append, coltext) {
 
 //function to setup new board and execute whether the correct choice is picked
 function riddleMe(points, category) {
+    //===================FUNCTION FOR WRONG GUESS===================
+function wrongGuess() {
+    //=======WRONG GUESS============
+    clearInterval(intervalID);
+    $(".timer").remove();
+    wrongAudio.play();
+    lives -= 1;
+    var answerWrapper = $(".answerWrapper");
+    headlines.text("Wrong");
+    answerWrapper.remove();
+    var answerWrapper = $("<div>");
+    answerWrapper.addClass("answerWrapper");
+    stageDiv.append(answerWrapper);
+    addRowCol(12,"correctTitle", answerWrapper, "The correct answer is:");
+    addRowCol(12,"finalAnswer", answerWrapper, correctAnswer);
+    var delayReset = setTimeout(function() {
+        $("#stage").remove();
+        //add back the stage 
+        var stageDiv = $("<div>");
+        stageDiv.addClass("container");
+        stageDiv.attr("id", "stage");
+        $(".wrapper").append(stageDiv);
+        headlines.text("Choose Your Category");
+        gridBoard("#stage",5,5);
+        $(".buttonChoice").click(function () {
+            clickAudio.play();
+            var points = $(this).data('points');
+            var category = $(this).data('category');
+            var box = $(this).data('box');
+            grid[box] = true;
+            riddleMe(points, category);
+        }) 
+    }, 3000)
+}
+
     var questObject = {};
     //remove stage
     $("#stage").remove();
 
     //update the headlines
-    headlines.text(category+" for $"+points);
+    headlines.html(category+" for $"+points);
+    
+    
+    //start the clock
+    var countClock = 10;
+    var newTimerDiv = $("<div>");
+    newTimerDiv.text("You have " + countClock + " seconds");
+    newTimerDiv.addClass("timer");
+    $(".jumbotron").prepend(newTimerDiv);
+
+    var intervalID; //hold the set interval
+    intervalID = setInterval(countDown, 1000);
+
+    //function countdown to subtract count and re display
+    function countDown() {
+        if (countClock > 0) {
+            countClock--;
+            $(".timer").text("You have " + countClock + " seconds");
+        }
+        else {
+            wrongGuess();
+        }
+    }
+
     
     //add back the stage 
     var stageDiv = $("<div>");
@@ -228,6 +286,8 @@ function riddleMe(points, category) {
         var correctCheck = $(this).data("answer");
         if (correctCheck === correctAnswer) {
             //======CORRECT GUESS================
+            clearInterval(intervalID);
+            $(".timer").remove();
             score += points;
             headlines.text("Correct");
             $(".score").text("$"+score);
@@ -259,35 +319,7 @@ function riddleMe(points, category) {
 
         }
         else {
-            //=======WRONG GUESS============
-            wrongAudio.play();
-            lives -= 1;
-            var answerWrapper = $(".answerWrapper");
-            headlines.text("Wrong");
-            answerWrapper.remove();
-            var answerWrapper = $("<div>");
-            answerWrapper.addClass("answerWrapper");
-            stageDiv.append(answerWrapper);
-            addRowCol(12,"correctTitle", answerWrapper, "The correct answer is:");
-            addRowCol(12,"finalAnswer", answerWrapper, correctAnswer);
-            var delayReset = setTimeout(function() {
-                $("#stage").remove();
-                //add back the stage 
-                var stageDiv = $("<div>");
-                stageDiv.addClass("container");
-                stageDiv.attr("id", "stage");
-                $(".wrapper").append(stageDiv);
-                headlines.text("Choose Your Category");
-                gridBoard("#stage",5,5);
-                $(".buttonChoice").click(function () {
-                    clickAudio.play();
-                    var points = $(this).data('points');
-                    var category = $(this).data('category');
-                    var box = $(this).data('box');
-                    grid[box] = true;
-                    riddleMe(points, category);
-                }) 
-            }, 3000)
+           wrongGuess();
         }
     })
     
@@ -301,6 +333,8 @@ $(".buttonChoice").click(function () {
     grid[box] = true;
     riddleMe(points, category);
 })
+
+
 
 
 
